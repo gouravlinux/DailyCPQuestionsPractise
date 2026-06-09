@@ -119,3 +119,43 @@ class Solution {
         return next[target];
     }
 }
+
+class Solution {
+    int n;
+    int[][] dp;
+    private int solve(int[] nums,int i,int target){
+        if(target < 0){
+            // base case: target can't be -ve
+            return 0;
+        }
+        if(i == n-1){
+            if(target == 0 && nums[i] == 0){
+                return 2; // either take nums[i] or not take it, therefore return 2
+            }
+            if(target == 0 || target == nums[i]){
+                // if target is 0, then not take that element
+                // if target == nums[i], take that element
+                return 1;
+            }
+            return 0;// do nothing
+        }
+        if(dp[i][target] != -1) return dp[i][target];
+        int take = solve(nums, i+1, target-nums[i]);
+        int not_take = solve(nums, i+1, target);
+        return dp[i][target] = take + not_take;
+    }
+    // Function to calculate the number of subsets with a given sum
+    public int perfectSum(int[] nums, int target) {
+        // code here
+        // using recursion + memoization
+        // TC : O(2^n)
+        // SC : O(n)
+        n = nums.length;
+        dp = new int[n][target+1];
+        for(int[] arr: dp){
+            Arrays.fill(arr, -1);
+        }
+        // using simple recursion
+        return solve(nums, 0, target);
+    }
+}
