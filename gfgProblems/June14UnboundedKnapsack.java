@@ -94,7 +94,7 @@ class Solution {
 class Solution {
 	public int knapSack(int val[], int wt[], int capacity) {
 		/*
-			tabulation
+			tabulation + space-optimization
 			TC : O(n * capacity)
 			SC : O(capacity)
 		*/
@@ -115,6 +115,35 @@ class Solution {
 				}
 			}
 			next = curr;
+		}
+		
+		return next[capacity];
+		
+	}
+}
+
+class Solution {
+	public int knapSack(int val[], int wt[], int capacity) {
+		/*
+    		tabulation + space-optimization (1D - Array)
+    		TC : O(n * capacity)
+    		SC : O(capacity)
+		*/
+		
+		int n = val.length;
+		
+		int[] next = new int[capacity + 1];
+		
+		for (int i = n - 1; i >= 0; i--) {
+			for (int remWt = 0; remWt <= capacity; remWt++) {
+				if (remWt == 0 || i == n) {
+					next[remWt] = 0;
+				} else {
+					int take = (remWt - wt[i] < 0)? Integer.MIN_VALUE : val[i] + next[remWt - wt[i]];
+					int notTake = 0 + next[remWt];
+					next[remWt] = Math.max(take, notTake);
+				}
+			}
 		}
 		
 		return next[capacity];
