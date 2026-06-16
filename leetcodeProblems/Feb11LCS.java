@@ -1,62 +1,114 @@
 class Solution {
-    int n;
-    int m;
-    int[][] dp;
+    int m, n;
 
-    private int solve(String text1, String text2, int i, int j) {
-        if (i >= n || j >= m)
-            return 0;
+    private int solve(int i, int j, String text1, String text2) {
+        if (i >= m || j >= n) {
+            return 0; // out-of-bounds
+        }
+
         if (text1.charAt(i) == text2.charAt(j)) {
-            return 1 + solve(text1, text2, i + 1, j + 1);
+            // same character!
+            return 1 + solve(i + 1, j + 1, text1, text2);
         }
-        if (dp[i][j] != -1)
-            return dp[i][j];
 
-        int include_i = solve(text1, text2, i, j + 1);
-        int include_j = solve(text1, text2, i + 1, j);
-        return dp[i][j] = Math.max(include_i, include_j);
+        return Math.max(solve(i, j + 1, text1, text2), solve(i + 1, j, text1, text2));
     }
 
     public int longestCommonSubsequence(String text1, String text2) {
-
-        // recursion + memoization
-        n = text1.length();
-        m = text2.length();
-        dp = new int[n][m];
-        for(int[] row: dp){
-            Arrays.fill(row, -1);
-        }
-        return solve(text1, text2, 0, 0);
-    }
-}
-class Solution {
-    int m;
-    int n;
-    int[][] dp;
-
-    public int longestCommonSubsequence(String text1, String text2) {
+        /*
+            using recursion
+            TC : O(2^(m+n))
+            SC : O(m+n)
+        */
         m = text1.length();
         n = text2.length();
-        dp = new int[m + 1][n + 1];
-        // tabulation (bottom-up DP)
-        // dp[i][j] = LCS of length i in text1 and length j in text2
-        // dp[0][i] = 0 and dp[i][0] = 0 (as nothing could be common)
-        // below lines are obvious in java
-        // for(int j = 0;j <= m;j++){
-        //     dp[0][j] = 0;
-        // }
-        // for(int i = 0;i <= n;i++){
-        //     dp[i][0] = 0;
-        // }
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
-                if (text1.charAt(i-1) == text2.charAt(j-1))
-                    dp[i][j] = 1 + dp[i - 1][j - 1];
-                    // 1 + value of any LCS found till i-1,j-1
-                else
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        return solve(0, 0, text1, text2);
+    }
+}
+
+class Solution {
+    int m, n;
+    int[][] dp;
+    private int solve(int i, int j, String text1, String text2) {
+        if (i >= m || j >= n) {
+            return 0; // out-of-bounds
+        }
+
+        if(dp[i][j] != -1)
+            return dp[i][j];
+
+        if (text1.charAt(i) == text2.charAt(j)) {
+            // same character!
+            return dp[i][j] = 1 + solve(i + 1, j + 1, text1, text2);
+        }
+
+        return dp[i][j] = Math.max(solve(i, j + 1, text1, text2), solve(i + 1, j, text1, text2));
+    }
+
+    public int longestCommonSubsequence(String text1, String text2) {
+        /*
+            using recursion + memoization
+            TC : O(m*n)
+            SC : O(m*n) + O(max(m,n)) stack space
+        */
+        m = text1.length();
+        n = text2.length();
+        dp = new int[m][n];
+        for(int[] arr: dp){
+            Arrays.fill(arr, -1);
+        }
+        return solve(0, 0, text1, text2);
+    }
+}
+
+class Solution {
+    public int longestCommonSubsequence(String text1, String text2) {
+        /*
+            using tabulation
+            TC : O(m*n)
+            SC : O(m*n)
+        */
+        int m = text1.length();
+        int n = text2.length();
+        int[][] dp = new int[m + 1][n + 1];
+        for (int i = m; i >= 0; i--) {
+            for (int j = n; j >= 0; j--) {
+                if (i == m || j == n) {
+                    dp[i][j] = 0; // out-of-bounds
+                } else if (text1.charAt(i) == text2.charAt(j)) {
+                    dp[i][j] = 1 + dp[i + 1][j + 1];
+                } else {
+                    dp[i][j] = Math.max(dp[i + 1][j], dp[i][j + 1]);
+                }
             }
         }
-        return dp[m][n];
+        return dp[0][0];
+    }
+}
+
+class Solution {
+    public int longestCommonSubsequence(String text1, String text2) {
+        /*
+            using tabulation + space-optimization to 2 1D array
+            TC : O(m*n)
+            SC : O(n)
+        */
+        int m = text1.length();
+        int n = text2.length();
+        int[] next = new int[n + 1];
+        for (int i = m; i >= 0; i--) {
+            int[] curr = new int[n + 1];
+            for (int j = n; j >= 0; j--) {
+                if (i == m || j == n) {
+                    curr[j] = 0; // out-of-bounds
+                } else if (text1.charAt(i) == text2.charAt(j)) {
+                    curr[j] = 1 + next[j + 1];
+                } else {
+                    curr[j] = Math.max(next[j], curr[j + 1]);
+                }
+            }
+            next = curr;
+        }
+        return next[0];
     }
 }
