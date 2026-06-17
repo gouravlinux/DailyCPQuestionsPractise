@@ -114,6 +114,11 @@ class Solution {
     }
 
     public boolean exist(char[][] board, String word) {
+	/*
+            using recursion + backtracking
+            TC : O(m * n * 3^(len)) : as we can't go back from where we had came from
+            SC : O(len) stack space(recursion depth)
+        */
         m = board.length;
         n = board[0].length;
         wordLen = word.length();
